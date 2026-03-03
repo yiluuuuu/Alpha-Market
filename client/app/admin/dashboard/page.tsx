@@ -13,11 +13,13 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 const AdminDashboard = () => {
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
     useEffect(() => {
         const fetchStats = async () => {
+            setLoading(true);
             try {
-                const res = await api.get('/dashboard/stats');
+                const res = await api.get('/dashboard/stats', { params: { period } });
                 setStats(res.data);
             } catch (err) {
                 console.error(err);
@@ -49,7 +51,7 @@ const AdminDashboard = () => {
             }
         };
         fetchStats();
-    }, []);
+    }, [period]);
 
     const StatCard = ({ title, value, icon: Icon, color, trend }: any) => (
         <div className="bg-white p-8 rounded-[32px] shadow-soft border border-gray-100 group hover:shadow-premium transition-all">
@@ -79,9 +81,18 @@ const AdminDashboard = () => {
                         <p className="text-gray-500 mt-2 font-medium">Overview of your Alpha Market empire.</p>
                     </div>
                     <div className="flex bg-white p-2 rounded-2xl shadow-soft border border-gray-100">
-                        <button className="px-4 py-2 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-premium">Daily</button>
-                        <button className="px-4 py-2 text-gray-400 text-xs font-black uppercase tracking-widest rounded-xl hover:text-gray-900 transition-all">Weekly</button>
-                        <button className="px-4 py-2 text-gray-400 text-xs font-black uppercase tracking-widest rounded-xl hover:text-gray-900 transition-all">Monthly</button>
+                        {(['daily', 'weekly', 'monthly'] as const).map((p) => (
+                            <button
+                                key={p}
+                                onClick={() => setPeriod(p)}
+                                className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all ${period === p
+                                        ? 'bg-primary text-white shadow-premium'
+                                        : 'text-gray-400 hover:text-gray-900'
+                                    }`}
+                            >
+                                {p}
+                            </button>
+                        ))}
                     </div>
                 </div>
 
@@ -152,7 +163,7 @@ const AdminDashboard = () => {
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 bg-primary/5 rounded-full flex items-center justify-center font-black text-primary text-xs">#{order.id.slice(-2)}</div>
                                             <div>
-                                                <p className="text-sm font-bold text-gray-900">{order.user.name}</p>
+                                                <p className="text-sm font-bold text-gray-900">{order.user?.name || order.shippingName || 'Customer'}</p>
                                                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{order.status}</p>
                                             </div>
                                         </div>

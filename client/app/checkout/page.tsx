@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ShieldCheck, Truck, CreditCard, ArrowRight, Loader2, MapPin, Phone, User } from 'lucide-react';
@@ -20,6 +20,13 @@ const CheckoutPage = () => {
         shippingCity: '',
         shippingPhone: '',
     });
+
+    // Guard: redirect to cart if empty
+    useEffect(() => {
+        if (items.length === 0) {
+            router.push('/cart');
+        }
+    }, [items, router]);
 
     const handlePlaceOrder = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -153,8 +160,8 @@ const CheckoutPage = () => {
                             </div>
                             <button
                                 onClick={handlePlaceOrder}
-                                disabled={loading}
-                                className="btn-primary w-full py-5 rounded-2xl flex items-center justify-center gap-3 text-lg"
+                                disabled={loading || items.length === 0}
+                                className="btn-primary w-full py-5 rounded-2xl flex items-center justify-center gap-3 text-lg disabled:opacity-50"
                             >
                                 {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
                                     <>

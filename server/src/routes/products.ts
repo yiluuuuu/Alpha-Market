@@ -30,17 +30,41 @@ const productSchema = z.object({
 // GET /api/products
 router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const { search, category, sortBy, order } = req.query as Record<string, string>;
+        const { search, category, sortBy, order, minPrice, maxPrice, page, limit } = req.query as Record<string, string>;
         const where: any = {};
         if (search) where.name = { contains: search, mode: 'insensitive' };
         if (category) where.category = { equals: category, mode: 'insensitive' };
+
+        // Price filtering
+        if (minPrice || maxPrice) {
+            where.price = {};
+            if (minPrice) where.price.gte = parseFloat(minPrice);
+            if (maxPrice) where.price.lte = parseFloat(maxPrice);
+        }
 
         const orderBy: any = {};
         if (sortBy === 'price') orderBy.price = order === 'desc' ? 'desc' : 'asc';
         else orderBy.createdAt = 'desc';
 
-        const products = await prisma.product.findMany({ where, orderBy });
-        res.json({ products });
+        // Pagination
+        const p = parseInt(page) || 1;
+        const l = parseInt(limit) || 50;
+        const skip = (p - 1) * l;
+
+        const [products, total] = await Promise.all([
+            prisma.product.findMany({ where, orderBy, skip, take: l }),
+            prisma.product.count({ where }),
+        ]);
+
+        res.json({
+            products,
+            pagination: {
+                total,
+                page: p,
+                limit: l,
+                pages: Math.ceil(total / l)
+            }
+        });
     } catch {
         res.status(500).json({ message: 'Server error' });
     }

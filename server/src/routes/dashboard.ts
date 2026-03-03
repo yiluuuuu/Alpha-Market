@@ -5,12 +5,20 @@ import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth';
 const router = Router();
 
 // GET /api/dashboard/stats (admin)
-router.get('/stats', authenticate, requireAdmin, async (_req: AuthRequest, res: Response): Promise<void> => {
+// Accepts ?period=daily|weekly|monthly
+router.get('/stats', authenticate, requireAdmin, async (req: AuthRequest, res: Response): Promise<void> => {
     try {
+        const period = (req.query.period as string) || 'daily';
+        const days = period === 'monthly' ? 30 : period === 'weekly' ? 7 : 7;
+
+        const periodStart = new Date();
+        periodStart.setDate(periodStart.getDate() - days);
+        periodStart.setHours(0, 0, 0, 0);
+
         const [totalProducts, totalOrders, revenueResult, recentOrders, lowStockProducts, ordersByStatus] = await Promise.all([
             prisma.product.count(),
-            prisma.order.count(),
-            prisma.order.aggregate({ _sum: { totalAmount: true } }),
+            prisma.order.count({ where: { createdAt: { gte: periodStart } } }),
+            prisma.order.aggregate({ _sum: { totalAmount: true }, where: { createdAt: { gte: periodStart } } }),
             prisma.order.findMany({
                 take: 5,
                 orderBy: { createdAt: 'desc' },
@@ -20,8 +28,8 @@ router.get('/stats', authenticate, requireAdmin, async (_req: AuthRequest, res: 
             prisma.order.groupBy({ by: ['status'], _count: true }),
         ]);
 
-        // Sales chart data: last 7 days
-        const days = 7;
+        // Sales chart grouped by day
+        const totalRevenue = await prisma.order.aggregate({ _sum: { totalAmount: true } });
         const salesChart = [];
         for (let i = days - 1; i >= 0; i--) {
             const date = new Date();
@@ -43,11 +51,13 @@ router.get('/stats', authenticate, requireAdmin, async (_req: AuthRequest, res: 
         res.json({
             totalProducts,
             totalOrders,
-            totalRevenue: revenueResult._sum.totalAmount || 0,
+            totalRevenue: totalRevenue._sum.totalAmount || 0,
+            periodRevenue: revenueResult._sum.totalAmount || 0,
             recentOrders,
             lowStockProducts,
             ordersByStatus,
             salesChart,
+            period,
         });
     } catch (err) {
         console.error(err);

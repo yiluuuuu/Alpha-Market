@@ -1,116 +1,138 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Package, Clock, CheckCircle2, Truck, Eye, ArrowRight, ShoppingBag } from 'lucide-react';
+import {
+    Package, Clock, CheckCircle2, Truck, Eye, ShoppingBag,
+    ArrowRight, Loader2, RefreshCw
+} from 'lucide-react';
 import api from '@/lib/axios';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import Link from 'next/link';
+
+const statusConfig: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
+    PENDING: { color: 'text-amber-500 bg-amber-50 border-amber-200', icon: <Clock className="w-4 h-4" />, label: 'Pending' },
+    PROCESSING: { color: 'text-blue-500 bg-blue-50 border-blue-200', icon: <Package className="w-4 h-4" />, label: 'Processing' },
+    SHIPPED: { color: 'text-indigo-600 bg-indigo-50 border-indigo-200', icon: <Truck className="w-4 h-4" />, label: 'Shipped' },
+    DELIVERED: { color: 'text-emerald-600 bg-emerald-50 border-emerald-200', icon: <CheckCircle2 className="w-4 h-4" />, label: 'Delivered' },
+};
 
 const OrdersPage = () => {
-    const [orders, setOrders] = useState([]);
+    const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const res = await api.get('/orders');
-                setOrders(res.data.orders);
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchOrders();
-    }, []);
-
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'PENDING': return <Clock className="w-5 h-5 text-amber-500" />;
-            case 'PROCESSING': return <Package className="w-5 h-5 text-blue-500" />;
-            case 'SHIPPED': return <Truck className="w-5 h-5 text-primary" />;
-            case 'DELIVERED': return <CheckCircle2 className="w-5 h-5 text-secondary" />;
-            default: return <Clock className="w-5 h-5 text-gray-400" />;
+    const fetchOrders = async () => {
+        setLoading(true);
+        try {
+            const res = await api.get('/orders');
+            setOrders(res.data.orders);
+        } catch {
+            setOrders([]);
+        } finally {
+            setLoading(false);
         }
     };
 
+    useEffect(() => { fetchOrders(); }, []);
+
     return (
         <ProtectedRoute>
-            <div className="pt-32 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-end mb-12">
+            <div className="pt-32 pb-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-12">
                     <div>
-                        <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase italic">Order History</h1>
-                        <p className="text-gray-500 mt-2 font-medium">Track your premium tech deliveries.</p>
+                        <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase">My Orders</h1>
+                        <p className="text-gray-400 mt-2 font-medium">
+                            {loading ? 'Loading...' : `${orders.length} order${orders.length !== 1 ? 's' : ''}`}
+                        </p>
                     </div>
-                    <Link href="/shop" className="text-primary font-bold flex items-center gap-2 hover:underline mb-2">
-                        Continue Shopping <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    <button
+                        onClick={fetchOrders}
+                        className="p-3 bg-white rounded-2xl shadow-soft border border-gray-100 text-gray-500 hover:text-primary transition-all hover:shadow-premium group"
+                    >
+                        <RefreshCw className={`w-5 h-5 group-hover:rotate-180 transition-transform duration-500 ${loading ? 'animate-spin' : ''}`} />
+                    </button>
                 </div>
 
                 {loading ? (
-                    <div className="space-y-6">
-                        {[1, 2, 3].map(i => <div key={i} className="h-40 bg-gray-100 rounded-3xl animate-pulse" />)}
+                    <div className="space-y-4">
+                        {[1, 2, 3].map((i) => <div key={i} className="h-28 bg-gray-100 animate-pulse rounded-3xl" />)}
                     </div>
-                ) : orders.length > 0 ? (
-                    <div className="space-y-6">
-                        {orders.map((order: any) => (
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                key={order.id}
-                                className="bg-white p-8 rounded-[32px] shadow-soft border border-gray-100 hover:shadow-premium transition-all group"
-                            >
-                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                                    <div className="flex items-center gap-6">
-                                        <div className="p-4 bg-gray-50 rounded-2xl">
-                                            <Package className="w-8 h-8 text-gray-400" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-black text-gray-900 uppercase tracking-tighter">Order #{order.id.slice(-6).toUpperCase()}</h3>
-                                            <p className="text-sm text-gray-400 font-bold uppercase tracking-widest mt-1">
-                                                Placed on {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-10 w-full md:w-auto">
-                                        <div className="text-right">
-                                            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Status</p>
-                                            <div className="flex items-center gap-2 font-black text-sm uppercase tracking-tighter italic">
-                                                {getStatusIcon(order.status)}
-                                                <span className={order.status === 'DELIVERED' ? 'text-secondary' : 'text-gray-900'}>{order.status}</span>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Total</p>
-                                            <p className="text-xl font-black text-primary tracking-tighter">${order.totalAmount.toLocaleString()}</p>
-                                        </div>
-                                        <button className="p-4 bg-gray-50 rounded-2xl hover:bg-primary/10 hover:text-primary transition-all self-center">
-                                            <Eye className="w-6 h-6" />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Micro product preview */}
-                                <div className="mt-8 pt-8 border-t border-gray-50 flex gap-4 overflow-x-auto pb-2">
-                                    {order.items?.map((item: any, idx: number) => (
-                                        <div key={idx} className="flex-shrink-0 flex items-center gap-3 bg-gray-50/50 px-4 py-2 rounded-xl">
-                                            <div className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center text-[10px] font-black">{item.quantity}x</div>
-                                            <span className="text-xs font-bold text-gray-600 line-clamp-1">{item.product?.name}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </motion.div>
-                        ))}
+                ) : orders.length === 0 ? (
+                    <div className="text-center py-24 bg-white rounded-[40px] border border-dashed border-gray-200">
+                        <ShoppingBag className="w-16 h-16 text-gray-200 mx-auto mb-6" />
+                        <h2 className="text-xl font-black text-gray-900 mb-2">No orders yet</h2>
+                        <p className="text-gray-400 font-medium mb-8">Start shopping to see your orders here</p>
+                        <Link href="/shop" className="btn-primary py-4 px-8 rounded-2xl inline-flex items-center gap-2">
+                            Shop Now <ArrowRight className="w-5 h-5" />
+                        </Link>
                     </div>
                 ) : (
-                    <div className="text-center py-20 bg-white rounded-[40px] shadow-soft border border-dashed border-gray-200">
-                        <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-6" />
-                        <h2 className="text-2xl font-black text-gray-900 mb-2 uppercase italic tracking-tighter">No orders yet</h2>
-                        <p className="text-gray-500 mb-8 max-w-sm mx-auto">Your purchase history is waiting to be filled with premium tech gear.</p>
-                        <Link href="/shop" className="btn-primary py-4 px-10 rounded-2xl inline-block">
-                            Start Shopping
-                        </Link>
+                    <div className="space-y-4">
+                        {orders.map((order, i) => {
+                            const sc = statusConfig[order.status] || statusConfig.PENDING;
+                            const itemCount = order.items?.length || 0;
+                            return (
+                                <motion.div
+                                    key={order.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.05 }}
+                                    className="bg-white p-6 rounded-[28px] shadow-soft border border-gray-100 hover:shadow-premium transition-all"
+                                >
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                        {/* Order info */}
+                                        <div className="flex items-center gap-5">
+                                            <div className={`p-3 rounded-2xl border ${sc.color}`}>
+                                                {sc.icon}
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-3 flex-wrap">
+                                                    <span className="font-black text-gray-900 text-lg tracking-tight">
+                                                        #{order.id.slice(-6).toUpperCase()}
+                                                    </span>
+                                                    <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg border ${sc.color}`}>
+                                                        {sc.label}
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-gray-400 font-medium mt-1">
+                                                    {new Date(order.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                    {itemCount > 0 && <> · {itemCount} item{itemCount !== 1 ? 's' : ''}</>}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Total + actions */}
+                                        <div className="flex items-center gap-4 sm:ml-auto">
+                                            <div className="text-right">
+                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total</p>
+                                                <p className="text-xl font-black text-gray-900">${order.totalAmount.toLocaleString()}</p>
+                                            </div>
+                                            <Link
+                                                href={`/orders/${order.id}`}
+                                                className="flex items-center gap-2 px-4 py-2.5 bg-primary/5 text-primary rounded-2xl font-bold text-sm hover:bg-primary text-primary hover:text-white transition-all group"
+                                            >
+                                                <Eye className="w-4 h-4" />
+                                                <span>Details</span>
+                                            </Link>
+                                        </div>
+                                    </div>
+
+                                    {/* Items preview */}
+                                    {order.items && order.items.length > 0 && (
+                                        <div className="mt-4 pt-4 border-t border-gray-50 flex flex-wrap gap-2">
+                                            {order.items.slice(0, 3).map((item: any, ii: number) => (
+                                                <span key={ii} className="text-xs font-bold text-gray-400 bg-gray-50 px-3 py-1.5 rounded-xl">
+                                                    {item.product?.name?.slice(0, 20) || 'Product'}{item.product?.name?.length > 20 ? '...' : ''} ×{item.quantity}
+                                                </span>
+                                            ))}
+                                            {order.items.length > 3 && (
+                                                <span className="text-xs font-bold text-primary bg-primary/5 px-3 py-1.5 rounded-xl">+{order.items.length - 3} more</span>
+                                            )}
+                                        </div>
+                                    )}
+                                </motion.div>
+                            );
+                        })}
                     </div>
                 )}
             </div>

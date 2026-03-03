@@ -18,6 +18,12 @@ const loginSchema = z.object({
     password: z.string().min(1),
 });
 
+const profileUpdateSchema = z.object({
+    name: z.string().min(2).optional(),
+    currentPassword: z.string().min(1).optional(),
+    newPassword: z.string().min(6).optional(),
+});
+
 // POST /api/auth/register
 router.post('/register', async (req: Request, res: Response): Promise<void> => {
     try {
@@ -70,6 +76,44 @@ router.get('/me', authenticate, async (req: AuthRequest, res: Response): Promise
         if (!user) { res.status(404).json({ message: 'User not found' }); return; }
         res.json({ user });
     } catch {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// PATCH /api/auth/profile — update name and/or password
+router.patch('/profile', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const data = profileUpdateSchema.parse(req.body);
+        const updateData: any = {};
+
+        if (data.name) updateData.name = data.name;
+
+        // Handle password change
+        if (data.newPassword) {
+            if (!data.currentPassword) {
+                res.status(400).json({ message: 'Current password is required to set a new password' });
+                return;
+            }
+            const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
+            if (!user) { res.status(404).json({ message: 'User not found' }); return; }
+
+            const valid = await bcrypt.compare(data.currentPassword, user.password);
+            if (!valid) {
+                res.status(400).json({ message: 'Current password is incorrect' });
+                return;
+            }
+            updateData.password = await bcrypt.hash(data.newPassword, 12);
+        }
+
+        const updated = await prisma.user.update({
+            where: { id: req.user!.id },
+            data: updateData,
+            select: { id: true, name: true, email: true, role: true },
+        });
+
+        res.json({ user: updated, message: 'Profile updated successfully' });
+    } catch (err: any) {
+        if (err.name === 'ZodError') { res.status(400).json({ message: 'Validation failed', errors: err.errors }); return; }
         res.status(500).json({ message: 'Server error' });
     }
 });

@@ -31,7 +31,22 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response): Promise<v
     }
 });
 
-// GET /api/orders/:id
+// GET /api/orders/all (admin alias — same as GET / but explicit)
+router.get('/all', authenticate, requireAdmin, async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const orders = await prisma.order.findMany({
+            include: {
+                user: { select: { name: true, email: true } },
+                items: { include: { product: { select: { name: true, image: true, price: true } } } },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+        res.json({ orders });
+    } catch {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 router.get('/:id', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const order = await prisma.order.findUnique({
