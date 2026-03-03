@@ -44,15 +44,7 @@ npm install
 npm run dev
 ```
 
-## 👤 Pre-seeded Accounts
 
-### Admin
-- **Email**: `yilkalbewketu8@gmail.com`
-- **Password**: `password123`
-
-### Customer
-- **Email**: `yilkalbewuketu@gmail.com`
-- **Password**: `password123`
 
 ---
-Built with ❤️ by Alpha Market Team.
+Built with ❤️ by Yilkal
