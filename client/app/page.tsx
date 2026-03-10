@@ -102,7 +102,7 @@ const Home = () => {
                             <div className="relative z-10 p-4">
                                 <div className="aspect-square relative rounded-[40px] overflow-hidden shadow-2xl">
                                     <Image
-                                        src="https://images.unsplash.com/photo-1546868889-4e0c68197577?w=800"
+                                        src="/images/earpod3.jpg?w=800"
                                         alt="Premium Watch"
                                         fill
                                         className="object-cover"

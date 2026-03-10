@@ -6,7 +6,7 @@ A premium, production-ready eCommerce platform built with **Next.js 15**, **Expr
 
 - **Actors**: Admin and Customer roles.
 - **Authentication**: JWT-based secure auth with role-based access.
-- **Admin Dashboard**: Real-time stats, sales charts (Recharts), and low-stock alerts.
+- **Admin Dashboard**: Real-time stats, sales charts , and low-stock alerts.
 - **Management**: Full Product CRUD and Order Fulfillment system.
 - **Shopping**: Product search, category filters, animated cart store, and secure checkout.
 - **Design**: World-class UI with Tailwind CSS, Framer Motion, and Glassmorphism.
