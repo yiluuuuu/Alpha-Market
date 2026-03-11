@@ -12,6 +12,9 @@ import productRoutes from './routes/products';
 import orderRoutes from './routes/orders';
 import dashboardRoutes from './routes/dashboard';
 import { PrismaClient } from '@prisma/client';
+export const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'], // <-- log all queries and errors
+});
 dotenv.config();
 
 const app = express();
