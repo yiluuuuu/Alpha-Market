@@ -34,12 +34,18 @@ app.use(helmet({
 }));
 
 // CORS middleware
+// CORS middleware
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // allow server-to-server requests
-    if (allowedOrigins.includes(origin)) {
+    if (!origin) return callback(null, true); // allow server-to-server or Postman requests
+
+    const clientUrl = process.env.CLIENT_URL?.replace(/\/$/, ''); // remove trailing slash
+    const requestOrigin = origin.replace(/\/$/, ''); // remove trailing slash
+
+    if (requestOrigin === clientUrl) {
       callback(null, true);
     } else {
+      console.error(`CORS blocked origin: ${origin}`);
       callback(new Error(`CORS policy: Origin ${origin} not allowed`));
     }
   },
