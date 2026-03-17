@@ -39,7 +39,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
 // Health check
-app.get('/api/health', (_req, res) => {
+app.get('/', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
