@@ -1,3 +1,4 @@
+// src/index.ts
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
@@ -12,24 +13,50 @@ import productRoutes from './routes/products';
 import orderRoutes from './routes/orders';
 import dashboardRoutes from './routes/dashboard';
 import { PrismaClient } from '@prisma/client';
-export const prisma = new PrismaClient({
-  log: ['query', 'info', 'warn', 'error'], // <-- log all queries and errors
-});
+
 dotenv.config();
+
+// Initialize Prisma
+export const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'], // log all queries and errors
+});
 
 const app = express();
 app.set('trust proxy', 1);
 const PORT = process.env.PORT || 5000;
 
+// Allowed frontend origins
+const allowedOrigins = [process.env.CLIENT_URL || 'http://localhost:3000'];
+
 // Security & parsing middleware
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:3000', credentials: true }));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
+
+// CORS middleware
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // allow server-to-server requests
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS policy: Origin ${origin} not allowed`));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+// Parse JSON & URL-encoded data
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Logging & rate limiting
 app.use(morgan('dev'));
 app.use(rateLimiter);
 
-// Static file serving for uploads
+// Serve static files (uploads)
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // API Routes
@@ -38,16 +65,22 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
-// Health check
+// Health check endpoint
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Root endpoint
 app.get('/', (_req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Error handler (must be last)
 app.use(errorHandler);
 
+// Start server
 app.listen(PORT, () => {
-    console.log(`🚀 Alpha Market server running on http://localhost:${PORT}`);
+  console.log(`🚀 Alpha Market server running on http://localhost:${PORT}`);
 });
 
 export default app;
