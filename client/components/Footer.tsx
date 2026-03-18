@@ -66,7 +66,7 @@ const Footer = () => {
 
                 <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center">
                     <p className="text-gray-400 text-xs">
-                        &copy; {new Date().getFullYear()} developed by.Yilkal bewuketu  +251986813580.
+                        &copy; {new Date().getFullYear()} Developed by Yilkal Bewuketu  +251986813580.
                     </p>
                     <div className="flex space-x-6 mt-4 md:mt-0">
                         <a href="#" className="text-gray-400 hover:text-gray-600 text-xs transition-colors">Privacy Policy</a>
