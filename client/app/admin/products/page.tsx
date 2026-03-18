@@ -54,7 +54,7 @@ const AdminProductsPage = () => {
                 stock: String(product.stock),
                 category: product.category,
             });
-            const existingImg = product.image?.startsWith('/') ? `http://localhost:5000${product.image}` : product.image;
+            const existingImg = product.image || '';
             setImagePreview(existingImg || '');
         } else {
             setEditing(null);
@@ -188,7 +188,7 @@ const AdminProductsPage = () => {
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {filtered.map((p, i) => {
-                                    const imgUrl = p.image?.startsWith('/') ? `http://localhost:5000${p.image}` : p.image;
+                                    const imgUrl = p.image || '';
                                     return (
                                         <motion.tr
                                             key={p.id}
