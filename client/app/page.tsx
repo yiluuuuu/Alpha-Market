@@ -32,7 +32,7 @@ const Home = () => {
         {
             id: '4',
             name: 'Used HP Laptop',
-            price: 18999,
+            price: 1800,
             image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500',
             category: 'Used PCs',
         },
