@@ -18,7 +18,7 @@ const Home = () => {
         {
             id: '2',
             name: 'Smart Digital Watch',
-            price: 2499,
+            price: 2400,
             image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500',
             category: 'Watches',
         },
