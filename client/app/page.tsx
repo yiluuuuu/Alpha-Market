@@ -128,7 +128,7 @@ const Home = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
                         {[
-                            { icon: Shield, title: 'Secure Payment', desc: '100% encrypted checkout process' },
+                            { icon: Shield, title: 'Payment After delivery', desc: '100% Trusted process' },
                             { icon: Globe, title: 'Free Shipping', desc: 'On all orders over $10,000' },
                             { icon: Award, title: 'Quality Guarantee', desc: '6 months warranty on all items' },
                             { icon: Zap, title: 'Fast Delivery', desc: 'Get your tech in 24-48 hours' },
