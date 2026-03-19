@@ -75,7 +75,7 @@ const Home = () => {
                                 transition={{ delay: 0.3 }}
                                 className="text-xl text-gray-500 mb-12 max-w-xl mx-auto lg:mx-0 leading-relaxed"
                             >
-                                Experience the intersection of premium design and cutting-edge technology. Explore our curated collection of elite gadgets.
+                                Experience the intersection of premium design and cutting-edge technology. Explore alpha market's curated collection of elite gadgets.
                             </motion.p>
                             <motion.div
                                 initial={{ opacity: 0, y: 30 }}
