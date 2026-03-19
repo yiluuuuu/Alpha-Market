@@ -11,7 +11,7 @@ const Home = () => {
         {
             id: '1',
             name: 'Apple-style Wireless EarPods',
-            price: 1299,
+            price: 1200,
             image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500',
             category: 'EarPods',
         },
