@@ -67,7 +67,7 @@ const Home = () => {
                                 className="text-6xl md:text-8xl font-black text-gray-900 tracking-tighter leading-none mb-8"
                             >
                                 LEVEL UP YOUR <br />
-                                <span className="text-primary italic">TECH GAME.</span>
+                                <span className="text-primary italic">TECH GAME</span>
                             </motion.h1>
                             <motion.p
                                 initial={{ opacity: 0, y: 30 }}
