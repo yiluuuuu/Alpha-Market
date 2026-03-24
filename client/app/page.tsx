@@ -174,7 +174,7 @@ const Home = () => {
                     <div className="flex justify-between items-end mb-16">
                         <div className="text-left">
                             <h2 className="text-4xl font-black text-gray-900 tracking-tight mb-2 uppercase">TRENDING TECH</h2>
-                            <p className="text-gray-500">Discover our most sought-after products this week.</p>
+                            <p className="text-gray-500">Discover  most sought-after products this week.</p>
                         </div>
                         <Link href="/shop" className="text-primary font-bold hover:underline flex items-center gap-2 mb-2">
                             View All <ArrowRight className="w-4 h-4" />
