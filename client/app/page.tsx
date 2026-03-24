@@ -198,7 +198,7 @@ const Home = () => {
                     <div className="relative z-10">
                         <h2 className="text-4xl md:text-6xl font-black mb-8 leading-tight">READY TO UPGRADE <br /> YOUR LIFESTYLE?</h2>
                         <p className="text-indigo-100 text-lg mb-12 max-w-xl mx-auto opacity-90 leading-relaxed">
-                            Join thousands of satisfied customers who have improved their productivity and style with Alpha Market tech.
+                            Join thousands of satisfied customers who have improved their productivity and style with Alpha Market.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link href="/auth/register" className="bg-white text-primary px-10 py-4 rounded-2xl font-bold text-lg hover:bg-gray-100 transition-all w-full sm:w-auto shadow-2xl">
