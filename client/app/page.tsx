@@ -58,7 +58,7 @@ const Home = () => {
                                 className="inline-flex items-center space-x-2 bg-primary/5 border border-primary/10 px-4 py-2 rounded-full mb-8 text-primary font-bold text-sm"
                             >
                                 <Zap className="w-4 h-4" />
-                                <span>New Arrival: Limited Edition Smart Watches</span>
+                                <span>New Arrival: Limited  Smart Watches</span>
                             </motion.div>
                             <motion.h1
                                 initial={{ opacity: 0, y: 30 }}
