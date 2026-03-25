@@ -150,7 +150,7 @@ const Home = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-4xl font-black text-gray-900 tracking-tight mb-4 uppercase">Popular Categories</h2>
-                        <p className="text-gray-500 max-w-xl mx-auto leading-relaxed">Shop our diverse range of premium products specifically curated for tech enthusiasts and students.</p>
+                        <p className="text-gray-500 max-w-xl mx-auto leading-relaxed">Shop diverse range of premium products specifically curated for tech enthusiasts and students.</p>
                     </div>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                         {categories.map((cat, i) => (
